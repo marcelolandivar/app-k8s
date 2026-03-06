@@ -5,8 +5,6 @@ steps:
       - 'build'
       - '-t'
       - 'europe-docker.pkg.dev/$PROJECT_ID/k8s-multi-app-repo/multi-client:$SHORT_SHA'
-      - '-t'
-      - 'europe-docker.pkg.dev/$PROJECT_ID/k8s-multi-app-repo/multi-client:latest'
       - '-f'
       - 'client/Dockerfile'
       - '.'
@@ -16,18 +14,12 @@ steps:
     args: ['push', 'europe-docker.pkg.dev/$PROJECT_ID/k8s-multi-app-repo/multi-client:$SHORT_SHA']
     id: 'push-client'
 
-  - name: 'gcr.io/cloud-builders/docker'
-    args: ['push', 'europe-docker.pkg.dev/$PROJECT_ID/k8s-multi-app-repo/multi-client:latest']
-    id: 'push-client-latest'
-
   # Build and push server image
   - name: 'gcr.io/cloud-builders/docker'
     args:
       - 'build'
       - '-t'
       - 'europe-docker.pkg.dev/$PROJECT_ID/k8s-multi-app-repo/multi-server:$SHORT_SHA'
-      - '-t'
-      - 'europe-docker.pkg.dev/$PROJECT_ID/k8s-multi-app-repo/multi-server:latest'
       - '-f'
       - 'server/Dockerfile'
       - '.'
@@ -37,18 +29,12 @@ steps:
     args: ['push', 'europe-docker.pkg.dev/$PROJECT_ID/k8s-multi-app-repo/multi-server:$SHORT_SHA']
     id: 'push-server'
 
-  - name: 'gcr.io/cloud-builders/docker'
-    args: ['push', 'europe-docker.pkg.dev/$PROJECT_ID/k8s-multi-app-repo/multi-server:latest']
-    id: 'push-server-latest'
-
   # Build and push worker image
   - name: 'gcr.io/cloud-builders/docker'
     args:
       - 'build'
       - '-t'
       - 'europe-docker.pkg.dev/$PROJECT_ID/k8s-multi-app-repo/multi-worker:$SHORT_SHA'
-      - '-t'
-      - 'europe-docker.pkg.dev/$PROJECT_ID/k8s-multi-app-repo/multi-worker:latest'
       - '-f'
       - 'worker/Dockerfile'
       - '.'
@@ -58,9 +44,6 @@ steps:
     args: ['push', 'europe-docker.pkg.dev/$PROJECT_ID/k8s-multi-app-repo/multi-worker:$SHORT_SHA']
     id: 'push-worker'
 
-  - name: 'gcr.io/cloud-builders/docker'
-    args: ['push', 'europe-docker.pkg.dev/$PROJECT_ID/k8s-multi-app-repo/multi-worker:latest']
-    id: 'push-worker-latest'
 
   # Deploy to Kubernetes
   - name: 'gcr.io/cloud-builders/kubectl'
@@ -73,7 +56,7 @@ steps:
       - '-n'
       - 'default'
     env:
-      - 'CLOUDSDK_COMPUTE_ZONE=europe-west3-a'
+      - 'CLOUDSDK_COMPUTE_ZONE=europe-west3'
       - 'CLOUDSDK_CONTAINER_CLUSTER=multi-k8s'
     id: 'deploy-client'
 
@@ -87,7 +70,7 @@ steps:
       - '-n'
       - 'default'
     env:
-      - 'CLOUDSDK_COMPUTE_ZONE=europe-west3-a'
+      - 'CLOUDSDK_COMPUTE_ZONE=europe-west3'
       - 'CLOUDSDK_CONTAINER_CLUSTER=multi-k8s'
     id: 'deploy-server'
 
@@ -101,7 +84,7 @@ steps:
       - '-n'
       - 'default'
     env:
-      - 'CLOUDSDK_COMPUTE_ZONE=europe-west3-a'
+      - 'CLOUDSDK_COMPUTE_ZONE=europe-west3'
       - 'CLOUDSDK_CONTAINER_CLUSTER=multi-k8s'
     id: 'deploy-worker'
 
