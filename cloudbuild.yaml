@@ -8,13 +8,17 @@ steps:
       - '-t'
       - 'europe-docker.pkg.dev/$PROJECT_ID/k8s-multi-app-repo/multi-client:latest'
       - '-f'
-      - 'complex/client/Dockerfile'
+      - 'client/Dockerfile'
       - '.'
     id: 'build-client'
 
   - name: 'gcr.io/cloud-builders/docker'
     args: ['push', 'europe-docker.pkg.dev/$PROJECT_ID/k8s-multi-app-repo/multi-client:$SHORT_SHA']
     id: 'push-client'
+
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['push', 'europe-docker.pkg.dev/$PROJECT_ID/k8s-multi-app-repo/multi-client:latest']
+    id: 'push-client-latest'
 
   # Build and push server image
   - name: 'gcr.io/cloud-builders/docker'
@@ -25,13 +29,17 @@ steps:
       - '-t'
       - 'europe-docker.pkg.dev/$PROJECT_ID/k8s-multi-app-repo/multi-server:latest'
       - '-f'
-      - 'complex/server/Dockerfile'
+      - 'server/Dockerfile'
       - '.'
     id: 'build-server'
 
   - name: 'gcr.io/cloud-builders/docker'
     args: ['push', 'europe-docker.pkg.dev/$PROJECT_ID/k8s-multi-app-repo/multi-server:$SHORT_SHA']
     id: 'push-server'
+
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['push', 'europe-docker.pkg.dev/$PROJECT_ID/k8s-multi-app-repo/multi-server:latest']
+    id: 'push-server-latest'
 
   # Build and push worker image
   - name: 'gcr.io/cloud-builders/docker'
@@ -42,7 +50,7 @@ steps:
       - '-t'
       - 'europe-docker.pkg.dev/$PROJECT_ID/k8s-multi-app-repo/multi-worker:latest'
       - '-f'
-      - 'complex/worker/Dockerfile'
+      - 'worker/Dockerfile'
       - '.'
     id: 'build-worker'
 
@@ -50,13 +58,17 @@ steps:
     args: ['push', 'europe-docker.pkg.dev/$PROJECT_ID/k8s-multi-app-repo/multi-worker:$SHORT_SHA']
     id: 'push-worker'
 
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['push', 'europe-docker.pkg.dev/$PROJECT_ID/k8s-multi-app-repo/multi-worker:latest']
+    id: 'push-worker-latest'
+
   # Deploy to Kubernetes
   - name: 'gcr.io/cloud-builders/kubectl'
     args:
       - 'set'
       - 'image'
       - 'deployment/client-deployment'
-      - 'client=europe-docker.pkg.dev/$PROJECT_ID/k8s-multi-app-repo/multi-client:$SHORT_SHA'
+      - 'client=europe-docker.pkg.dev/$PROJECT_ID/k8s-multi-app-repo/multi-client:latest'
       - '--record'
       - '-n'
       - 'default'
@@ -70,7 +82,7 @@ steps:
       - 'set'
       - 'image'
       - 'deployment/server-deployment'
-      - 'server=europe-docker.pkg.dev/$PROJECT_ID/k8s-multi-app-repo/multi-server:$SHORT_SHA'
+      - 'server=europe-docker.pkg.dev/$PROJECT_ID/k8s-multi-app-repo/multi-server:latest'
       - '--record'
       - '-n'
       - 'default'
@@ -84,7 +96,7 @@ steps:
       - 'set'
       - 'image'
       - 'deployment/worker-deployment'
-      - 'worker=europe-docker.pkg.dev/$PROJECT_ID/k8s-multi-app-repo/multi-worker:$SHORT_SHA'
+      - 'worker=europe-docker.pkg.dev/$PROJECT_ID/k8s-multi-app-repo/multi-worker:latest'
       - '--record'
       - '-n'
       - 'default'

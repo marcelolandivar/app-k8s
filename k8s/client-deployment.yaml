@@ -14,6 +14,7 @@ spec:
     spec:
       containers:
         - name: client
-          image: rallycoding/multi-client # stephengrider/multi-client
+          image: europe-docker.pkg.dev/$PROJECT_ID/k8s-multi-app-repo/multi-client:latest
+          imagePullPolicy: Always
           ports:
             - containerPort: 3000
