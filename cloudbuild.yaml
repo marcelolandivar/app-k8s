@@ -14,6 +14,17 @@ steps:
     args: ['push', 'europe-docker.pkg.dev/$PROJECT_ID/k8s-multi-app-repo/multi-client:$SHORT_SHA']
     id: 'push-client'
 
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'tag'
+      - 'europe-docker.pkg.dev/$PROJECT_ID/k8s-multi-app-repo/multi-client:$SHORT_SHA'
+      - 'europe-docker.pkg.dev/$PROJECT_ID/k8s-multi-app-repo/multi-client:latest'
+    id: 'tag-client-latest'
+
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['push', 'europe-docker.pkg.dev/$PROJECT_ID/k8s-multi-app-repo/multi-client:latest']
+    id: 'push-client-latest'
+
   # Build and push server image
   - name: 'gcr.io/cloud-builders/docker'
     args:
@@ -28,6 +39,17 @@ steps:
   - name: 'gcr.io/cloud-builders/docker'
     args: ['push', 'europe-docker.pkg.dev/$PROJECT_ID/k8s-multi-app-repo/multi-server:$SHORT_SHA']
     id: 'push-server'
+
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'tag'
+      - 'europe-docker.pkg.dev/$PROJECT_ID/k8s-multi-app-repo/multi-server:$SHORT_SHA'
+      - 'europe-docker.pkg.dev/$PROJECT_ID/k8s-multi-app-repo/multi-server:latest'
+    id: 'tag-server-latest'
+
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['push', 'europe-docker.pkg.dev/$PROJECT_ID/k8s-multi-app-repo/multi-server:latest']
+    id: 'push-server-latest'
 
   # Build and push worker image
   - name: 'gcr.io/cloud-builders/docker'
@@ -45,6 +67,25 @@ steps:
     id: 'push-worker'
 
 
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'tag'
+      - 'europe-docker.pkg.dev/$PROJECT_ID/k8s-multi-app-repo/multi-worker:$SHORT_SHA'
+      - 'europe-docker.pkg.dev/$PROJECT_ID/k8s-multi-app-repo/multi-worker:latest'
+    id: 'tag-worker-latest'
+
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['push', 'europe-docker.pkg.dev/$PROJECT_ID/k8s-multi-app-repo/multi-worker:latest']
+    id: 'push-worker-latest'
+
+  - name: 'gcr.io/cloud-builders/kubectl'
+    args: ['apply', '-f', 'k8s']
+    env:
+      - 'CLOUDSDK_COMPUTE_ZONE=europe-west3'
+      - 'CLOUDSDK_CONTAINER_CLUSTER=multi-k8s'
+    id: 'apply-k8s-manifests'
+
+
   # Deploy to Kubernetes
   - name: 'gcr.io/cloud-builders/kubectl'
     args:
@@ -52,7 +93,6 @@ steps:
       - 'image'
       - 'deployment/client-deployment'
       - 'client=europe-docker.pkg.dev/$PROJECT_ID/k8s-multi-app-repo/multi-client:latest'
-      - '--record'
       - '-n'
       - 'default'
     env:
@@ -66,7 +106,6 @@ steps:
       - 'image'
       - 'deployment/server-deployment'
       - 'server=europe-docker.pkg.dev/$PROJECT_ID/k8s-multi-app-repo/multi-server:latest'
-      - '--record'
       - '-n'
       - 'default'
     env:
@@ -80,18 +119,12 @@ steps:
       - 'image'
       - 'deployment/worker-deployment'
       - 'worker=europe-docker.pkg.dev/$PROJECT_ID/k8s-multi-app-repo/multi-worker:latest'
-      - '--record'
       - '-n'
       - 'default'
     env:
       - 'CLOUDSDK_COMPUTE_ZONE=europe-west3'
       - 'CLOUDSDK_CONTAINER_CLUSTER=multi-k8s'
     id: 'deploy-worker'
-
-images:
-  - 'europe-docker.pkg.dev/$PROJECT_ID/k8s-multi-app-repo/multi-client:$SHORT_SHA'
-  - 'europe-docker.pkg.dev/$PROJECT_ID/k8s-multi-app-repo/multi-server:$SHORT_SHA'
-  - 'europe-docker.pkg.dev/$PROJECT_ID/k8s-multi-app-repo/multi-worker:$SHORT_SHA'
 
 timeout: '1800s'
 options:
