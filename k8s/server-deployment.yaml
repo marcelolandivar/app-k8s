@@ -14,7 +14,8 @@ spec:
     spec:
       containers:
         - name: server
-          image: rallycoding/multi-server-dev
+          image: europe-docker.pkg.dev/$PROJECT_ID/k8s-multi-app-repo/multi-server:latest
+          imagePullPolicy: Always
           ports:
             - containerPort: 5000
           env:
